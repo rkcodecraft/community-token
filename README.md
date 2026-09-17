@@ -25,11 +25,112 @@ The contract was deployed and tested on the Ethereum Sepolia test network.
 
 ## Technologies
 
-- **Solidity** — smart contract programming language
-- **Foundry** — development, testing, deployment, and interaction framework
-- **OpenZeppelin Contracts** — reusable, battle-tested Solidity contract implementations
-- **Git** — version control
-- **Ethereum Sepolia** — test network
+- Solidity — smart contract programming language
+- Foundry — development, testing, deployment, and interaction framework
+- OpenZeppelin Contracts — reusable, battle-tested Solidity contract implementations
+- Git — version control
+- Ethereum Sepolia — test network
+
+## Installation and Usage
+
+### Requirements
+
+- [Foundry](https://book.getfoundry.sh/getting-started/installation)
+- Git
+- A Sepolia RPC endpoint for testnet deployment
+- A funded Sepolia testnet wallet for deployment
+
+### Clone the repository
+
+Clone the repository together with its Git submodules:
+```bash
+git clone --recurse-submodules https://github.com/rkcodecraft/community-token.git
+cd community-token
+```
+
+If the repository was cloned without submodules, initialize them with:
+```bash
+git submodule update --init --recursive
+```
+
+The submodules provide:
+- `lib/forge-std`
+- `lib/openzeppelin-contracts`
+
+### Build the project
+
+```bash
+forge build
+```
+
+### Run the tests
+
+```bash
+forge test
+```
+
+To include gas usage:
+```bash
+forge test --gas-report
+```
+
+The current test suite contains 18 tests.
+
+### Run a local Anvil deployment
+
+Start a local Anvil node in one terminal:
+```bash
+anvil
+```
+
+In a second terminal, deploy using one of Anvil's test private keys:
+```bash
+forge script script/DeployCommunityToken.s.sol:DeployCommunityToken \
+  --rpc-url http://127.0.0.1:8545 \
+  --broadcast \
+  --private-key <ANVIL_PRIVATE_KEY>
+```
+
+Use only Anvil-generated private keys for local development.
+
+### Deploy to Sepolia
+
+Create a local `.env` file based on the example file:
+```bash
+cp .env.example .env
+```
+
+Set your RPC URL, private key, and Etherscan API key in `.env`:
+```dotenv
+SEPOLIA_RPC_URL=your_sepolia_rpc_url
+PRIVATE_KEY=your_deployer_private_key
+ETHERSCAN_API_KEY=your_etherscan_api_key
+```
+
+Never commit `.env` or any file containing private keys or API keys.
+
+Export the variables in your terminal:
+```bash
+source .env
+```
+
+Then deploy:
+```bash
+forge script script/DeployCommunityToken.s.sol:DeployCommunityToken \
+  --rpc-url "$SEPOLIA_RPC_URL" \
+  --broadcast \
+  --private-key "$PRIVATE_KEY"
+```
+
+To verify the deployed contract on Etherscan, use the deployed contract address and constructor arguments required by the deployment script:
+```bash
+forge verify-contract <DEPLOYED_CONTRACT_ADDRESS> \
+  src/CommunityToken.sol:CommunityToken \
+  --chain sepolia \
+  --etherscan-api-key "$ETHERSCAN_API_KEY"
+```
+
+The exact verification command may depend on the constructor arguments and the compiler settings in `foundry.toml`.
 
 ## Project Structure
 
@@ -84,23 +185,18 @@ Adds token-burning functionality:
 ### Ownable
 
 Provides ownership and access control.
-
 The contract uses `onlyOwner` to restrict administrative functions.
-
 The owner controls:
-
 - Minting
 - Pausing
 - Unpausing
-- Ownership administration
+- Ownership transfer
 
 ### ERC20Pausable
 
-Provides the ability to pause token transfers.
-
-When the token is paused, transfers are blocked.
-
-The owner can unpause the token to restore normal transfer functionality.
+Provides the ability to pause token operations.
+When the token is paused, transfers, minting, and burning are blocked.
+The owner can unpause the token to restore normal operation.
 
 ## CommunityToken Contract
 
@@ -234,7 +330,6 @@ The initial CommunityToken implementation is complete.
 - Solidity contract implemented
 - OpenZeppelin dependencies installed
 - Foundry unit tests written
-- **13 tests passing**
 - Local Anvil testing
 - Sepolia deployment
 - Etherscan verification

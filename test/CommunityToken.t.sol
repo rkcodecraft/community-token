@@ -94,6 +94,8 @@ contract CommunityTokenTest is Test {
 
         vm.expectRevert();
         vm.prank(owner);
+
+        // forge-lint: disable-next-line(erc20-unchecked-transfer)
         token.transfer(ALICE, TRANSFER_AMOUNT);
 
         // Verify that the balances remain unchanged after the failed transfer
