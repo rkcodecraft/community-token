@@ -1,0 +1,19 @@
+# Compiler files
+cache/
+out/
+
+# Commonly ignored directories
+.logs/
+.ignore/
+
+# Broadcast / deployment logs (not source)
+broadcast/**/*.json
+!/broadcast/.gitkeep
+
+# Docs
+docs/
+
+# Dotenv file
+.env
+.env.*
+!.env.example
